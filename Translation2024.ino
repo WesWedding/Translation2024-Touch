@@ -6,6 +6,21 @@
 #define MPR121_ADDR 0x5C
 #define MPR121_INT 4
 
+// mp3 includes
+#include <SPI.h>
+#include <SdFat.h>
+#include <FreeStack.h> 
+#include <SFEMP3Shield.h>
+
+// mp3 variables
+SFEMP3Shield MP3player;
+byte result;
+int lastPlayed = 0;
+
+// sd card instantiation
+SdFat sd;
+SdFile file;
+
 // The pin to use to signal to other devices that stages are set
 #define PIN_ATTRACT 10
 #define PIN_STEP1 11
@@ -34,8 +49,19 @@ void setup() {
   digitalWrite(PIN_STEP1, LOW);
   digitalWrite(PIN_STEP2, LOW);
 
-   if(!MPR121.begin(MPR121_ADDR)) Serial.println("error setting up MPR121");
-   MPR121.setInterruptPin(MPR121_INT);
+  if(!sd.begin(SD_SEL, SPI_HALF_SPEED)) sd.initErrorHalt();
+
+  if(!MPR121.begin(MPR121_ADDR)) Serial.println("error setting up MPR121");
+  MPR121.setInterruptPin(MPR121_INT);
+
+  result = MP3player.begin();
+  MP3player.setVolume(10,10);
+
+  if(result != 0) {
+    Serial.print("Error code: ");
+    Serial.print(result);
+    Serial.println(" when trying to start MP3 player");
+  }
 }
 
 unsigned long int startOf2 = 0;
@@ -100,6 +126,8 @@ void switchToAttract() {
   digitalWrite(PIN_ATTRACT, HIGH);
   digitalWrite(PIN_STEP1, LOW);
   digitalWrite(PIN_STEP2, LOW);
+
+  playSound(state);
 }
 
 void switchToStep1() {
@@ -108,6 +136,8 @@ void switchToStep1() {
   digitalWrite(PIN_ATTRACT, LOW);
   digitalWrite(PIN_STEP1, HIGH);
   digitalWrite(PIN_STEP2, LOW);
+
+  playSound(state);
 }
 
 void switchToStep2() {
@@ -116,6 +146,8 @@ void switchToStep2() {
   digitalWrite(PIN_ATTRACT, LOW);
   digitalWrite(PIN_STEP1, LOW);
   digitalWrite(PIN_STEP2, HIGH);
+
+  playSound(state);
 }
 
 void switchToDone() {
@@ -124,6 +156,8 @@ void switchToDone() {
   digitalWrite(PIN_ATTRACT, LOW);
   digitalWrite(PIN_STEP1, LOW);
   digitalWrite(PIN_STEP2, LOW);
+
+  playSound(state);
 }
 
 void readTouchInputs(bool touched[], size_t n){
@@ -184,4 +218,25 @@ void readTouchInputs(bool touched[], size_t n){
       }
     }
   }
+}
+
+void playSound(states state) {
+  if (MP3player.isPlaying()) {
+    MP3player.stopTrack();
+  }
+  char fileName[255]; // 255 is the longest possible file name size
+  switch(state) {
+    case STEP1:
+      strcpy(fileName, "step1.mp3" + '\0');
+      break;
+    case STEP2:
+      strcpy(fileName, "step2.mp3" + '\0');
+      break;
+    default:
+      // Don't make a peep!  Bail out early.
+      return;
+      break;
+  }
+
+  MP3player.playMP3(fileName);
 }
