@@ -9,11 +9,11 @@ This is the code that drives the primary board in Tabitha Darrah and Weston Wedd
 Despite Bare Conductive's website asserting otherwise, its driver package does work with Arduino 2.0 IDEs.  The instructions are just a little more complicated because the sketch folder might be redefined.  Use all of the same folders the instructions mention, just put them where the Sketch folder has been defined in preferences.
 
 
-#### MP3 Player and Touch Uses a ton of space
+##### MP3 Player and Touch Uses a ton of space
 Just using some of the core features of the board gobble up most of the free space for program storage AND dynamic memory.  Anything else that might use up a lot of additional space (like NeoPixel strands) might be best put onto another board.
 
 
-#### TweenDuino space measurements
+##### TweenDuino space measurements
 
 Initial sketch
 ```cpp  
@@ -87,3 +87,11 @@ Empty timeline: 10236 prog (+ 5290b) , 326 (+ 172b) dynamic
 4th tween: 10936 prog (+ 32b) , 326 (+ 0b) dynamic
 `t1.addTo(value, 11112.8f, 12UL);`
 5th tween: 10966 prog (+ 30b) , 326 (+ 0b) dynamic
+
+
+##### LED cost
+
+Each Neopixel costs about 3 bytes of RAM, dynamically allocated during runtime.
+
+The real overhead is just including the library and utilizing library functions; basic demo sketch size is 7806 bytes.
+
