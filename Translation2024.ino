@@ -26,6 +26,10 @@ SdFile file;
 #define PIN_STEP1 11
 #define PIN_STEP2 12
 
+// I2C Addresses
+#define I2C_LIGHT_ADDR 0x2C
+#define I2C_TOUCH_ADDR 0x8C
+
 bool touched[] = {false, false};
 const size_t touchCount = sizeof(touched) / sizeof(touched[0]);
 
@@ -62,6 +66,10 @@ void setup() {
     Serial.print(result);
     Serial.println(" when trying to start MP3 player");
   }
+
+  Wire.begin(I2C_TOUCH_ADDR);
+  Wire.onRequest(requestEvent);
+  Serial.println("Brgin");
 }
 
 unsigned long int startOf2 = 0;
@@ -120,44 +128,32 @@ void loop() {
   }
 }
 
+void updateState(states newState) {
+  state = newState;
+}
+
 void switchToAttract() {
   Serial.println("Started attract.");
-  state = ATTRACT;
-  digitalWrite(PIN_ATTRACT, HIGH);
-  digitalWrite(PIN_STEP1, LOW);
-  digitalWrite(PIN_STEP2, LOW);
-
-  playSound(state);
+  updateState(ATTRACT);
+  playSound(ATTRACT);
 }
 
 void switchToStep1() {
   Serial.println("Started step 1.");
-  state = STEP1;
-  digitalWrite(PIN_ATTRACT, LOW);
-  digitalWrite(PIN_STEP1, HIGH);
-  digitalWrite(PIN_STEP2, LOW);
-
-  playSound(state);
+  updateState(STEP1);
+  playSound(STEP1);
 }
 
 void switchToStep2() {
   Serial.println("Started step 2.");
-  state = STEP2;
-  digitalWrite(PIN_ATTRACT, LOW);
-  digitalWrite(PIN_STEP1, LOW);
-  digitalWrite(PIN_STEP2, HIGH);
-
-  playSound(state);
+  updateState(STEP2);
+  playSound(STEP2);
 }
 
 void switchToDone() {
   Serial.println("Started done stage.");
-  state = DONE;
-  digitalWrite(PIN_ATTRACT, LOW);
-  digitalWrite(PIN_STEP1, LOW);
-  digitalWrite(PIN_STEP2, LOW);
-
-  playSound(state);
+  updateState(DONE);
+  playSound(DONE);
 }
 
 void readTouchInputs(bool touched[], size_t n){
@@ -239,4 +235,13 @@ void playSound(states state) {
   }
 
   MP3player.playMP3(fileName);
+}
+
+// function that executes whenever data is requested by master
+// this function is registered as an event, see setup()
+void requestEvent() {
+  Serial.println("reqyest");
+  char buffer[2];
+  itoa(state, buffer, 10);
+  Wire.write(buffer);
 }
