@@ -158,60 +158,22 @@ void switchToDone() {
 }
 
 void readTouchInputs(bool touched[], size_t n){
-  if(MPR121.touchStatusChanged()){
-    
-    MPR121.updateTouchData();
 
-    // only make an action if we have one or fewer pins touched
-    // ignore multiple touches
+  if (!MPR121.touchStatusChanged()) {
+    return;
+  }
 
-    // We only care about the first two touches.
-    for (size_t i= 0; i < n; i++) {
-      if (MPR121.isNewTouch(i)) {
-        touched[i] = true;
-        Serial.print("pin ");
-        Serial.print(i);
-        Serial.println(" was just touched");
-        digitalWrite(LED_BUILTIN, HIGH);
-      } else {
-          if(MPR121.isNewRelease(i)){
-            touched[i] = false;
-            Serial.print("pin ");
-            Serial.print(i);
-            Serial.println(" is no longer being touched");
-          } 
-        }
-    }
-    
-    if(MPR121.getNumTouches()<=1){
-      for (int i=0; i < 12; i++){  // Check which electrodes were pressed
-        if(MPR121.isNewTouch(i)){        
-            //pin i was just touched
+  MPR121.updateTouchData();
 
-        
-            /*if(MP3player.isPlaying()){
-              if(lastPlayed==i){
-                // if we're already playing from the requested folder, stop it
-                MP3player.stopTrack();
-                Serial.println("stopping track");
-              } else {
-                // if we're already playing a different track, stop that 
-                // one and play the newly requested one
-                MP3player.stopTrack();
-                Serial.println("stopping track");
-                playRandomTrack(i);
-                
-                // don't forget to update lastPlayed - without it we don't
-                // have a history
-                lastPlayed = i;
-              }
-            } else {
-              // if we're playing nothing, play the requested track 
-              // and update lastplayed
-              playRandomTrack(i);
-              lastPlayed = i;
-            }  */    
-        }
+  // We only care about the first two touches in this application.
+  for (size_t i= 0; i < n; i++) {
+    if (MPR121.isNewTouch(i)) {
+      touched[i] = true;
+      // Update onboard LED to reflect a recognized touch.
+      digitalWrite(LED_BUILTIN, HIGH);
+    } else {
+      if (MPR121.isNewRelease(i)) {
+        touched[i] = false;
       }
     }
   }
