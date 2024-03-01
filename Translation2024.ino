@@ -30,8 +30,6 @@ SdFile file;
 #define I2C_LIGHT_ADDR 0x2C
 #define I2C_TOUCH_ADDR 0x8C
 
-#define STEP2_DURATION 10870
-
 bool touched[] = {false, false};
 const size_t touchCount = sizeof(touched) / sizeof(touched[0]);
 
@@ -74,8 +72,6 @@ void setup() {
   Serial.println("Brgin");
 }
 
-unsigned long int startOf2 = 0;
-
 void loop() {
 
   readTouchInputs(touched, touchCount);
@@ -96,7 +92,6 @@ void loop() {
 
     // Both touch points touched?
     if (touched[0] && touched[1]) {
-      startOf2 = millis();
       switchToStep2();
     // Just the 1st touch touched?
     } else if (touched[0]) {
@@ -109,8 +104,6 @@ void loop() {
     Serial.println("Running Active stage (step 2)");
 
     // Stay in the "stage 2" mode until MP3 player is done.
-    auto time = millis();
-    //if (time - startOf2 > STEP2_DURATION) {
     if (!MP3player.isPlaying()) {
       Serial.println("Stage 2 done.");
       switchToDone();
@@ -173,7 +166,7 @@ void readTouchInputs(bool touched[], size_t n){
     // ignore multiple touches
 
     // We only care about the first two touches.
-    for (int i= 0; i < n; i++) {
+    for (size_t i= 0; i < n; i++) {
       if (MPR121.isNewTouch(i)) {
         touched[i] = true;
         Serial.print("pin ");
