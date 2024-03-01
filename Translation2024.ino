@@ -37,8 +37,8 @@ const size_t touchCount = sizeof(touched) / sizeof(touched[0]);
 
 enum states {
   ATTRACT,
-  STEP1,
-  STEP2,
+  PENDING,
+  FULL_ACTIVE,
   DONE,
 } state;
 
@@ -85,7 +85,7 @@ void loop() {
     if (touched[0]) {
       switchToStep1();
     }
-  } else if (state == STEP1) {
+  } else if (state == PENDING) {
     // TODO: Rapidly starting and stopping mp3 player can cause a crash, so some protection
     //       should go here.
 
@@ -100,7 +100,7 @@ void loop() {
     } else {
       switchToAttract();
     }
-  } else if (state == STEP2) {
+  } else if (state == FULL_ACTIVE) {
     Serial.println("Running Active stage (step 2)");
 
     // Stay in the "stage 2" mode until MP3 player is done.
@@ -143,14 +143,14 @@ void switchToAttract() {
 
 void switchToStep1() {
   Serial.println("Started step 1.");
-  updateState(STEP1);
-  playSound(STEP1);
+  updateState(PENDING);
+  playSound(PENDING);
 }
 
 void switchToStep2() {
   Serial.println("Started step 2.");
-  updateState(STEP2);
-  playSound(STEP2);
+  updateState(FULL_ACTIVE);
+  playSound(FULL_ACTIVE);
 }
 
 void switchToDone() {
@@ -225,10 +225,10 @@ void playSound(states state) {
   }
   char fileName[255]; // 255 is the longest possible file name size
   switch(state) {
-    case STEP1:
+    case PENDING:
       strcpy(fileName, "step1.mp3" + '\0');
       break;
-    case STEP2:
+    case FULL_ACTIVE:
       strcpy(fileName, "step2.mp3" + '\0');
       break;
     default:
