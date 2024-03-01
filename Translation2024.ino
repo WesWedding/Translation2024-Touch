@@ -89,6 +89,11 @@ void loop() {
     // TODO: Rapidly starting and stopping mp3 player can cause a crash, so some protection
     //       should go here.
 
+    // Keep that MP3 looping.
+    if (!MP3player.isPlaying()) {
+      playSound(PENDING);
+    }
+
     // Both touch points touched?
     if (touched[0] && touched[1]) {
       startOf2 = millis();
