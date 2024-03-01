@@ -30,6 +30,8 @@ SdFile file;
 #define I2C_LIGHT_ADDR 0x2C
 #define I2C_TOUCH_ADDR 0x8C
 
+#define STEP2_DURATION 10870
+
 bool touched[] = {false, false};
 const size_t touchCount = sizeof(touched) / sizeof(touched[0]);
 
@@ -101,9 +103,10 @@ void loop() {
   } else if (state == STEP2) {
     Serial.println("Running Active stage (step 2)");
 
-    // Stay in the "stage 2" mode for 5 seconds, then revert to attract.
+    // Stay in the "stage 2" mode until MP3 player is done.
     auto time = millis();
-    if (time - startOf2 > 5000) {
+    //if (time - startOf2 > STEP2_DURATION) {
+    if (!MP3player.isPlaying()) {
       Serial.println("Stage 2 done.");
       switchToDone();
     }
