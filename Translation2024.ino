@@ -28,12 +28,9 @@ SdFile file;
 bool touched[] = {false, false};
 const size_t touchCount = sizeof(touched) / sizeof(touched[0]);
 
-enum states {
-  ATTRACT,
-  PENDING,
-  FULL_ACTIVE,
-  DONE,
-} state;
+#include "StateQueue.h"
+StateQueue pendingReports;
+states state;
 
 void setup() {
   Serial.begin(57600);
@@ -128,6 +125,7 @@ void loop() {
 }
 
 void updateState(states newState) {
+  pendingReports.enqueue(newState);
   state = newState;
 }
 
@@ -198,6 +196,16 @@ void playSound(states state) {
 // this function is registered as an event, see setup()
 void requestEvent() {
   char buffer[2];
-  itoa(state, buffer, 10);
+
+  // Report any pending state changes first, before reporting current state.
+  states report = state;
+  if (pendingReports.isEmpty()) {
+    itoa(report, buffer, 10);     
+  } else {
+    pendingReports.dequeue(report);
+    itoa(report, buffer, 10);
+    Serial.print("reporting queued state: ");
+    Serial.println(buffer);
+  }
   Wire.write(buffer);
 }
