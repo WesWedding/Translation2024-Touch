@@ -21,11 +21,6 @@ int lastPlayed = 0;
 SdFat sd;
 SdFile file;
 
-// The pin to use to signal to other devices that stages are set
-#define PIN_ATTRACT 10
-#define PIN_STEP1 11
-#define PIN_STEP2 12
-
 // I2C Addresses
 #define I2C_LIGHT_ADDR 0x2C
 #define I2C_TOUCH_ADDR 0x8C
@@ -43,15 +38,8 @@ enum states {
 void setup() {
   Serial.begin(57600);
   pinMode(LED_BUILTIN, OUTPUT);
-  pinMode(PIN_ATTRACT, OUTPUT);
-  pinMode(PIN_STEP1, OUTPUT);
-  pinMode(PIN_STEP2, OUTPUT);
 
   Serial.println("2024: Translation");
-
-  digitalWrite(PIN_ATTRACT, LOW);
-  digitalWrite(PIN_STEP1, LOW);
-  digitalWrite(PIN_STEP2, LOW);
 
   if(!sd.begin(SD_SEL, SPI_HALF_SPEED)) sd.initErrorHalt();
 
