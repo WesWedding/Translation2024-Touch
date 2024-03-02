@@ -57,7 +57,6 @@ void setup() {
 
   Wire.begin(I2C_TOUCH_ADDR);
   Wire.onRequest(requestEvent);
-  Serial.println("Brgin");
 }
 
 void loop() {
@@ -90,7 +89,6 @@ void loop() {
       switchToAttract();
     }
   } else if (state == FULL_ACTIVE) {
-    Serial.println("Running Active stage (step 2)");
 
     // First, check if the required touches are still happening.
     // No first touch at all?  Back to the beginning.
@@ -104,7 +102,6 @@ void loop() {
     // We like the touches, but maybe the MP3 player finished.
     // Stay in the "stage 2" mode until MP3 player is done.
     if (!MP3player.isPlaying()) {
-      Serial.println("Stage 2 done.");
       switchToDone();
     }
   } else if (state == DONE) {
@@ -135,25 +132,21 @@ void updateState(states newState) {
 }
 
 void switchToAttract() {
-  Serial.println("Started attract.");
   updateState(ATTRACT);
   playSound(ATTRACT);
 }
 
 void switchToStep1() {
-  Serial.println("Started step 1.");
   updateState(PENDING);
   playSound(PENDING);
 }
 
 void switchToStep2() {
-  Serial.println("Started step 2.");
   updateState(FULL_ACTIVE);
   playSound(FULL_ACTIVE);
 }
 
 void switchToDone() {
-  Serial.println("Started done stage.");
   updateState(DONE);
   playSound(DONE);
 }
@@ -204,7 +197,6 @@ void playSound(states state) {
 // function that executes whenever data is requested by master
 // this function is registered as an event, see setup()
 void requestEvent() {
-  Serial.println("reqyest");
   char buffer[2];
   itoa(state, buffer, 10);
   Wire.write(buffer);
