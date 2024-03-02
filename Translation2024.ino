@@ -79,6 +79,7 @@ void loop() {
     }
 
     // Both touch points touched?
+    // See also: DONE state; this check is duplicated in both.
     if (touched[0] && touched[1]) {
       switchToStep2();
     // Just the 1st touch touched?
@@ -91,12 +92,25 @@ void loop() {
   } else if (state == FULL_ACTIVE) {
     Serial.println("Running Active stage (step 2)");
 
+    // First, check if the required touches are still happening.
+    // No first touch at all?  Back to the beginning.
+    if (!touched[0]) {
+      switchToAttract();
+    // Lost the 2nd touch, only?  Back to step1.
+    } else if (!touched[1]) {
+      switchToStep1();
+    }
+
+    // We like the touches, but maybe the MP3 player finished.
     // Stay in the "stage 2" mode until MP3 player is done.
     if (!MP3player.isPlaying()) {
       Serial.println("Stage 2 done.");
       switchToDone();
     }
   } else if (state == DONE) {
+
+    // Both touch points touched?
+    // See also: ATTRACT state; this check is duplicated in both.
     if (touched[0] && touched[1]) {
       switchToStep2();
     } else if (touched[0]) {
@@ -104,7 +118,6 @@ void loop() {
     } else {
       switchToAttract();
     }
-
   } else {
     Serial.println("ERROR: Shouldn't be here.");
   }
