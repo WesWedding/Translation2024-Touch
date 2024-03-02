@@ -1,8 +1,4 @@
-#include "Arduino.h"
-
 #include "StateQueue.h"
-
-
 
 StateQueue::StateQueue() : size(0) {}
 
@@ -12,7 +8,6 @@ bool StateQueue::enqueue(states newState) {
   }
 
   queue[size] = newState;
-  Serial.print("Queuing: ");  Serial.print(newState);  Serial.print(", spot ");  Serial.println(size);
   size++;
   return true;
 }

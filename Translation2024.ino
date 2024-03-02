@@ -97,7 +97,6 @@ void loop() {
     }
 
     // We like the touches, but maybe the MP3 player finished.
-    // Stay in the "stage 2" mode until MP3 player is done.
     if (!MP3player.isPlaying()) {
       switchToDone();
     }
