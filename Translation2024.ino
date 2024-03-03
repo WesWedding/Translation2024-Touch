@@ -86,16 +86,6 @@ void loop() {
       switchToAttract();
     }
   } else if (state == FULL_ACTIVE) {
-
-    // First, check if the required touches are still happening.
-    // No first touch at all?  Back to the beginning.
-    if (!touched[0]) {
-      switchToAttract();
-    // Lost the 2nd touch, only?  Back to step1.
-    } else if (!touched[1]) {
-      switchToStep1();
-    }
-
     // We like the touches, but maybe the MP3 player finished.
     if (!MP3player.isPlaying()) {
       switchToDone();
